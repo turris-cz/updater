@@ -324,15 +324,19 @@ end
 function get_nonconf_files(pkg)
 	local pkg_path = syscnf.info_dir .. pkg.Package
 	local files = {}
-	local md5sum_file = io.open(pkg_path .. ".files-md5sum")
-	if md5sum_file then
-		for line in md5sum_file:lines() do
+	local hash_file = nil
+	for _, files_hash in pairs({"files-sha256sum", "files-sha256", "files-md5sum"}) do
+		hash_file = io.open(pkg_path .. "." .. files_hash)
+		if hash_file then break end
+	end
+	if hash_file then
+		for line in hash_file:lines() do
 			local hash, name = line:match('^(%S+)%s+(%S+)$')
 			if name and hash then
 				files[name] = hash
 			end
 		end
-		md5sum_file:close()
+		hash_file:close()
 	end
 	local conffile = io.open(pkg_path .. ".conffiles")
 	if conffile then

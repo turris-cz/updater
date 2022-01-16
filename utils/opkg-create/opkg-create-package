@@ -24,16 +24,18 @@ if [ -n "$(find data -type f)" ]; then
 		| sed 's/ data/ /' > files-md5sum
 	find data -type f -print0 | xargs -0 sha256sum \
 		| sed 's/ data/ /' > files-sha256
+	cp files-sha256 files-sha256sum
 else
-	touch files-{md5sum,sha256}
+	touch files-{md5sum,sha256,sha256sum}
 fi
 # Create control.tar.gz
 tar -czf control.tar.gz \
 	./control \
 	./files-md5sum \
 	./files-sha256 \
+	./files-sha256sum \
 	"${control_optional[@]}"
-rm files-{md5sum,sha256}
+rm files-{md5sum,sha256,sha256sum}
 
 # package data
 tar -czf data.tar.gz -C data .
