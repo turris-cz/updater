@@ -36,7 +36,7 @@ local uri = require "uri"
 
 module "utils"
 
--- luacheck: globals lines2set map set2arr arr2set cleanup_dirs dir_ensure mkdirp read_file write_file clone shallow_copy table_merge arr_append exception multi_index private filter_best strip table_overlay randstr arr_prune arr_inv file_exists uri_syste_cas uri_no_crl uri_config uri_content
+-- luacheck: globals lines2set map set2arr arr2set reccmp cleanup_dirs dir_ensure mkdirp read_file write_file clone shallow_copy table_merge arr_append exception multi_index private filter_best strip table_overlay randstr arr_prune arr_inv file_exists uri_syste_cas uri_no_crl uri_config uri_content
 
 --[[
 Convert provided text into set of lines. Doesn't care about the order.
@@ -100,6 +100,27 @@ function arr_inv(arr)
 		arr[endi - i] = v
 	end
 	return arr
+end
+
+-- Recursive compare (targets tables)
+function reccmp(a, b)
+	if a == b then
+		return true
+	end
+	if type(a) == "table" and type(b) == "table" then
+		for key, value in pairs(a) do
+			if not reccmp(value, b[key]) then
+				return false
+			end
+		end
+		for key, value in pairs(b) do
+			if not reccmp(value, a[key]) then
+				return false
+			end
+		end
+		return true
+	end
+	return false
 end
 
 -- Run rm -rf on all dirs in the provided table

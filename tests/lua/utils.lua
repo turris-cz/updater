@@ -70,6 +70,20 @@ function test_arr_inv()
 	assert_table_equal({"d", "c", "b", "a"}, U.arr_inv({"a", "b", "c", "d"}))
 end
 
+function test_reccmp()
+	assert_true(U.reccmp({}, {}))
+	assert_true(U.reccmp("foo", "foo"))
+	assert_true(U.reccmp(42, 42))
+	assert_true(U.reccmp(nil, nil))
+	assert_true(U.reccmp({[1]=11, [2]=22}, {[1]=11, [2]=22}))
+	assert_true(U.reccmp({[1]={[1]={[1]=42}}}, {[1]={[1]={[1]=42}}}))
+	assert_false(U.reccmp({[1]=11}, {[1]=11, [2]=22}))
+	assert_false(U.reccmp({[1]=11}, {}))
+	assert_false(U.reccmp({[1]={[2]={[1]=42}}}, {[1]={[1]={[1]=42}}}))
+	assert_false(U.reccmp({[1]={[1]={[1]=24}}}, {[1]={[1]={[1]=42}}}))
+	assert_false(U.reccmp({[2]={[1]={[1]=42}}}, {[1]={[1]={[1]=42}}}))
+end
+
 function test_clone()
 	local input = {
 		x = 1,

@@ -608,6 +608,19 @@ function required_pkgs(pkgs, requests)
 	return build_plan(pkgs, requests, sat, satmap)
 end
 
+
+local function check_install_version_field(field_name, installed_field, requested_field)
+	if field_name == "Version" then
+		return backend.version_cmp(installed_field, requested_field) == 0
+	elseif field_name == "Depends" or field_name == "Conflicts" then
+		local installed_deps = postprocess.deps_canon(installed_field)
+		local requested_deps = postprocess.deps_canon(requested_field)
+		return utils.reccmp(installed_deps, requested_deps)
+	else
+		return installed_field == requested_field
+	end
+end
+
 --[[
 Go trough the list of requests and create list of all packages required to be
 installed. Those packages are not on system at all or are in different versions.
@@ -633,7 +646,7 @@ local function check_install_version(status, requests)
 				for _, field in ipairs({"Version", "Architecture", "LinkSignature", "FilesSignature", "Depends", "Conflicts", "Provides"}) do
 					local installed_field = status[request.name][field] or ""
 					local requested_field = request.package[field] or ""
-					if installed_field ~= requested_field then
+					if not check_install_version_field(field, installed_field, requested_field) then
 						different = field
 						break
 					end

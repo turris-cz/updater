@@ -1930,6 +1930,10 @@ function test_filter_required()
 			Version = "10",
 			FilesSignature = "xxxx"
 		},
+		pkg11 = {
+			Version = "11",
+			Depends = "kernel (= 5.5),  kmod-usb-serial"
+		},
 	}
 	local requests = {
 		{
@@ -2020,6 +2024,19 @@ function test_filter_required()
 			package = {
 				Version = "10",
 				FilesSignature = "xxxx",
+				repo = def_repo
+			},
+			critical = false,
+			modifier = {}
+		},
+		{
+			-- Installed with correct version and same Depends but with
+			-- differences in string
+			action = "require",
+			name = "pkg11",
+			package = {
+				Version = "11",
+				Depends = "kernel (=5.5), kmod-usb-serial",
 				repo = def_repo
 			},
 			critical = false,
