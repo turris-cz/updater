@@ -1,4 +1,4 @@
-AC_INIT([updater-ng], [69.1.3], [tech.support@turris.cz])
+AC_INIT([updater-ng], [70.0.0], [tech.support@turris.cz])
 AC_CONFIG_MACRO_DIRS([.m4])
 AC_CONFIG_AUX_DIR([.aux])
 

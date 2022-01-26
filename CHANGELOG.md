@@ -4,20 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [70.0.0] - 22-01-26
 ### Added
 - Change log that leaves minimal trace of changes updater performed stored in
   system.
 - Support for `FilesSignature` field in packages. On mismatch it trigger
   reinstall.
+- Support for `files-sha256sum` in packages as hash index
 
 ### Fixed
 - Subprocess call is now terminated way earlier thanks to `SIGCHLD` signal
   handling. This improves update time for any scripts spawning "daemon" processes
   that do not correctly redirect or close standard outputs.
+- Reinstall of packages if some fields were formated differently in index than
+  in package (updater no longer detects change by simple string comparison)
 
 ### Changed
 - Internal implementation of base64 replaced with base64c library.
+- Utility opkg-create template and input format
 
 ### Removed
 - `--state-log` argument
