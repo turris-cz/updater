@@ -352,8 +352,10 @@ function get_changed_files(files)
 	local changed = {}
 	for filename, hash in pairs(files) do
 		if utils.file_exists(filename) then
+			TRACE("Checking file in system against package index: " .. filename)
 			local filehash = md5_file(filename)
 			if filehash ~= hash then
+				TRACE("The file change detected: " .. filename)
 				table.insert(changed, filename)
 			end
 		end
