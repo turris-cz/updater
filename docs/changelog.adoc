@@ -28,11 +28,11 @@ Example:
 
 ----
 START	1623398031
-STOP	1623398075
+END	1623398075
 ----
 
-Any other line described in this document are inserted between `START` and `STOP`.
-Note that `STOP` is appended only at the end of transaction.
+Any other line described in this document are inserted between `START` and `END`.
+Note that `END` is appended only at the end of transaction.
 
 === Package change
 
