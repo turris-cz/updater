@@ -63,7 +63,7 @@ module "backend"
 -- luacheck: globals cmd_timeout cmd_kill_timeout
 -- Functions that we want to access from outside (ex. for testing purposes)
 -- luacheck: globals block_parse block_split block_dump_ordered pkg_status_dump package_postprocess status_parse get_parent config_modified
--- luacheck: globals repo_parse status_dump pkg_unpack pkg_examine collision_check installed_confs steal_configs pkg_merge_files pkg_merge_control pkg_config_info pkg_cleanup_files pkg_update_alternatives pkg_remove_alternatives script_run control_cleanup parse_pkg_specifier version_cmp version_match run_state user_path_move get_nonconf_files get_changed_files
+-- luacheck: globals repo_parse status_dump pkg_unpack pkg_examine collision_check installed_confs steal_configs pkg_merge_files pkg_merge_control pkg_config_info pkg_cleanup_files pkg_update_alternatives pkg_remove_alternatives script_run control_cleanup parse_pkg_specifier version_cmp version_match run_state user_path_move get_nonconf_files get_changed_files get_hasher
 
 --[[
 Configuration of the module. It is supported (yet unlikely to be needed) to modify
@@ -348,13 +348,39 @@ function get_nonconf_files(pkg)
 	return files
 end
 
+-- Select correct hashing function to compare hashes
+function get_hasher(hash)
+	local len = hash:len()
+	local hasher
+	if len == 32 then
+		hasher = md5_file
+	elseif len == 64 then
+		hasher = sha256_file
+	elseif len > 32 and len < 64 then
+		--[[
+		Something produces (produced?) truncated hashes in the status file.
+		Handle them. This is likely already fixed, but we don't want to
+		crash on system that still have these broken hashes around.
+		]]
+		hasher = function (file)
+			WARN("Truncated sha256 hash seen, using bug compat mode")
+			return sha256_file(file):sub(1, len)
+		end
+	else
+		error("Can not determine hash algorithm to use for hash " .. hash)
+	end
+	return hasher
+end
+
+-- Return files that were modified by user
 function get_changed_files(files)
 	local changed = {}
 	for filename, hash in pairs(files) do
 		if utils.file_exists(filename) then
 			TRACE("Checking file in system against package index: " .. filename)
-			local filehash = md5_file(filename)
-			if filehash ~= hash then
+			local hasher = get_hasher(hash)
+			local filehash = hasher(filename)
+			if filehash:lower() ~= hash:lower() then
 				TRACE("The file change detected: " .. filename)
 				table.insert(changed, filename)
 			end
@@ -1072,25 +1098,7 @@ is returned.
 ]]
 function config_modified(file, hash)
 	DBG("Checking if file " .. file .. " is modified against " .. hash)
-	local len = hash:len()
-	local hasher
-	if len == 32 then
-		hasher = md5_file
-	elseif len == 64 then
-		hasher = sha256_file
-	elseif len > 32 and len < 64 then
-		--[[
-		Something produces (produced?) truncated hashes in the status file.
-		Handle them. This is likely already fixed, but we don't want to
-		crash on system that still have these broken hashes around.
-		]]
-		hasher = function (file)
-			WARN("Truncated sha256 hash seen, using bug compat mode")
-			return sha256_file(file):sub(1, len)
-		end
-	else
-		error("Can not determine hash algorithm to use for hash " .. hash)
-	end
+	local hasher = get_hasher(hash)
 	if utils.file_exists(file) then
 		local got = hasher(file):lower()
 		hash = hash:lower()

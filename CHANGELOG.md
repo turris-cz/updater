@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Invalid keyword in documentation stating that transaction ends with `STOP` but
   it is signaled by keyword `END` instead
+- Using correct hashing function to detect changes to non-configuration files
 
 
 ## [70.0.0] - 22-01-26
