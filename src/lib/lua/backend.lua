@@ -51,6 +51,7 @@ local sha256_file = sha256_file
 local archive = archive
 local path_utils = path_utils
 local DBG = DBG
+local TRACE = TRACE
 local WARN = WARN
 local ERROR = ERROR
 local syscnf = require "syscnf"
