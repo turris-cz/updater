@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Use escape sequences only on terminal
+- Do not fail when `--state-log` or `--task-log` is provided. Output a warning and
+  ignore them instead for a sake of backward compatibility.
 
 
 ## [70.0.1] - 22-10-26

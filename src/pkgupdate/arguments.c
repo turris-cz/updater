@@ -18,6 +18,7 @@ enum option_val_prg {
 	OPT_OUT_OF_ROOT,
 	OPT_REEXEC,
 	OPT_REBOOT_FINISHED,
+	OPT_OBSOLETE_ARG,
 };
 
 static struct argp_option options[] = {
@@ -31,6 +32,9 @@ static struct argp_option options[] = {
 	// Following options are internal
 	{"reexec", OPT_REEXEC, NULL, OPTION_HIDDEN, "", 0},
 	{"reboot-finished", OPT_REBOOT_FINISHED, NULL, OPTION_HIDDEN, "", 0},
+	// Following options are obsolete and do nothing, but are kept for backward compatibility
+	{"state-log", OPT_OBSOLETE_ARG, "file", OPTION_HIDDEN, "", 0},
+	{"task-log", OPT_OBSOLETE_ARG, "file", OPTION_HIDDEN, "", 0},
 	{NULL}
 };
 
@@ -66,6 +70,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 			break;
 		case OPT_REBOOT_FINISHED:
 			opts->reboot_finished = true;
+			break;
+		case OPT_OBSOLETE_ARG:
+			WARN("You are using an obsolete option '%s', please check the documentation.", state->argv[state->next - 2]);
 			break;
 		case ARGP_KEY_ARG:
 			if (!opts->config) {
