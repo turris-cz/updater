@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <string.h>
+#include <unistd.h>
 
 struct level_info {
 	const char *prefix;
@@ -64,9 +65,17 @@ void log_internal(enum log_level level, const char *file, size_t line, const cha
 	}
 	if (do_stderr) {
 		if (stderr_level < LL_DBG)
-			fprintf(stderr, "%s:%s\n", levels[level].prefix, msg);
+			if (isatty(STDERR_FILENO) == 1) {
+				fprintf(stderr, "%s:%s\n", levels[level].prefix, msg);
+			} else {
+				fprintf(stderr, "%s:%s\n", levels[level].name, msg);
+			}
 		else
-			fprintf(stderr, "%s:%s:%zu (%s):%s\n", levels[level].prefix, file, line, func, msg);
+			if (isatty(STDERR_FILENO) == 1) {
+				fprintf(stderr, "%s:%s:%zu (%s):%s\n", levels[level].prefix, file, line, func, msg);
+			} else {
+				fprintf(stderr, "%s:%s:%zu (%s):%s\n", levels[level].name, file, line, func, msg);
+			}
 	}
 }
 
