@@ -822,6 +822,29 @@ static int lua_sha256_file(lua_State *L) {
 	return 1;	
 }
 
+static int lua_get_turris_serial(lua_State *L) {
+	char buffer[20];
+	buffer[0] = 0;
+	FILE* cw = popen("crypto-wrapper serial", "r");
+	if(cw == NULL) {
+		ERROR("Running crypto-wrapper failed!");
+		return 0;
+	}
+	if(fgets(buffer, 20, cw) == NULL) {
+		ERROR("Reading crypto-wrapper output failed!");
+		pclose(cw);
+		return 0;
+	}
+    pclose(cw);
+	if(buffer[16] == '\n')
+		buffer[16] = 0;
+	if(strlen(buffer) != 16) {
+		ERROR("Incorrect length of serial number '%s'", buffer);
+		return 0;
+	}
+	lua_pushstring(L, buffer);
+	return 1;
+}
 
 static int lua_reexec(lua_State *L) {
 	size_t args_c = lua_gettop(L);
@@ -875,7 +898,8 @@ static const struct injected_func injected_funcs[] = {
 	{ lua_sha256, "sha256" },
 	{ lua_sha256_file, "sha256_file" },
 	{ lua_reexec, "reexec" },
-	{ lua_get_updater_version, "get_updater_version" }
+	{ lua_get_updater_version, "get_updater_version" },
+	{ lua_get_turris_serial, "get_turris_serial" }
 };
 
 struct {
