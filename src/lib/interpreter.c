@@ -835,11 +835,16 @@ static int lua_get_turris_serial(lua_State *L) {
 		pclose(cw);
 		return 0;
 	}
-    pclose(cw);
-	if(buffer[16] == '\n')
-		buffer[16] = 0;
+	pclose(cw);
+	buffer[16] = 0;
 	if(strlen(buffer) != 16) {
 		ERROR("Incorrect length of serial number '%s'", buffer);
+		return 0;
+	}
+	long long unsigned serial = 0;
+	sscanf(buffer, "%llx", &serial);
+	if(serial == 0 || (serial % 11) != 0) {
+		ERROR("Invalid serial number '%s'", buffer);
 		return 0;
 	}
 	lua_pushstring(L, buffer);
