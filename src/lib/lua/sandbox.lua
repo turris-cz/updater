@@ -68,6 +68,7 @@ local rest_available_funcs = {
 	"math",
 	"assert",
 	"error",
+	"fetch",
 	"ipairs",
 	"next",
 	"pairs",
@@ -184,6 +185,10 @@ local funcs = {
 		Script = {
 			mode = "wrap",
 			value = requests.script
+		},
+		Fetch = {
+			mode = "wrap",
+			value = requests.fetch
 		},
 		Mode = {
 			mode = "wrap",

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [70.2.0] - 23-04-05
+### Added
+- Provide `Fetch` command to get content of the file while checking the signature
+
 ## [70.1.0] - 23-01-10
 ### Added
 - Provide function `get_turris_serial` returning serial number available inside Lua

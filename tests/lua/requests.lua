@@ -132,6 +132,11 @@ function test_install_uninstall()
 	assert_equal("context", result.tp, result.msg)
 end
 
+function test_fetch()
+	-- The URI contains 'Hello!'
+	assert_equal(requests.fetch({parent_script_uri = nil},"data:base64,SGVsbG8h"), "Hello!")
+end
+
 function test_script()
 	-- The URI contains 'Install "pkg"'
 	local result = sandbox.run_sandboxed([[

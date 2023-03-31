@@ -43,7 +43,7 @@ local ERROR = ERROR
 
 module "requests"
 
--- luacheck: globals known_packages known_repositories repositories_uri_master repo_serial repository content_requests install uninstall mode script package
+-- luacheck: globals known_packages known_repositories repositories_uri_master repo_serial repository content_requests install uninstall mode fetch script package
 
 -- Verifications fields are same for script, repository and package. Lets define them here once and then just append.
 local allowed_extras_verification = {
@@ -398,6 +398,25 @@ function mode(_, ...)
 	end
 end
 
+local allowed_fetch_extras = {
+	["optional"] = utils.arr2set({"boolean"}),
+}
+utils.table_merge(allowed_fetch_extras, allowed_extras_verification)
+
+function fetch(context, document_uri, extra)
+	extra = allowed_extras_check_type(allowed_fetch_extras, 'fetch', extra or {})
+	extra_check_verification("fetch", extra)
+	local ok, content, _ = pcall(utils.uri_content, document_uri, context.parent_script_uri, extra)
+	if not ok then
+		if extra.optional then
+			WARN("Document " .. document_uri .. " couldn't be fetched: " .. content)
+			return nil
+		end
+		error(content)
+	end
+	return content
+end
+
 local allowed_script_extras = {
 	["security"] = utils.arr2set({"string"}),
 	["optional"] = utils.arr2set({"boolean"}),
@@ -439,7 +458,7 @@ function script(context, filler, script_uri, extra)
 	end
 	-- Insert the data related to validation, so scripts inside can reuse the info
 	local merge = {
-		-- Note: this uri does not contain any data (it was finished) so we use it only as paret for meta data
+		-- Note: this uri does not contain any data (it was finished) so we use it only as parent for meta data
 		["parent_script_uri"] = u
 	}
 	local err = sandbox.run_sandboxed(content, script_uri, extra.security, context, merge)

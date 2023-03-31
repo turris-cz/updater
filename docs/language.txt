@@ -249,6 +249,28 @@ NOTE: There is also obsoleted extra option `ignore`. This should not be used and
 any value set to it is effectively considered to be same as setting `optional` to
 `true`.
 
+Fetch
+~~~~~
+
+  Fetch("uri", { extra })
+
+This command returns content of the file.
+
+The uri provides the location of the file.
+
+The second parameter is a table with extra information. It allows
+fine-tuning the verification of URI. The current extra parameters are
+following.
+
+optional::
+  Set this to `true` to not fail if retrieval of this file fails.
+sig::
+pubkey::
+ca::
+crl::
+ocsp::
+  Options to verify the file integrity.
+
 Repository
 ~~~~~~~~~~
 
